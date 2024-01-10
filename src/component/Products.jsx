@@ -1,16 +1,17 @@
 /* eslint-disable no-unused-vars */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import Skeleton from "react-loading-skeleton";
 
 const Products = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  let componentMounted = true;
+  let componentMounted = useRef(true);
 
   useEffect(() => {
     const getProducts = async () => {
       setLoading(true);
       const response = await fetch("https://fakestoreapi.com/products");
-      if (componentMounted) {
+      if (componentMounted.current) {
         const jsonData = await response.json();
         setData(jsonData);
         setLoading(false);
@@ -22,10 +23,25 @@ const Products = () => {
       };
     };
     getProducts();
-  }, []); // Empty dependency array means this effect runs once after initial render
+  }, []);
 
   const Loading = () => {
-    return <>Loading.....</>;
+    return (
+      <>
+        <div className="col-md-3">
+          <Skeleton height={350} />
+        </div>
+        <div className="col-md-3">
+          <Skeleton height={350} />
+        </div>
+        <div className="col-md-3">
+          <Skeleton height={350} />
+        </div>
+        <div className="col-md-3">
+          <Skeleton height={350} />
+        </div>
+      </>
+    );
   };
 
   const ShowProducts = () => {
@@ -33,32 +49,42 @@ const Products = () => {
     return (
       <>
         <div className="buttons d-flex justify-content-center mb-5 pb-5">
-          <button className="btn btn-outline-dark me-2">All</button>
-          <button className="btn btn-outline-dark me-2">Men`s Clothing</button>
+          <button
+            className="btn btn-outline-dark me-2"
+            onClick={() => setData(data)}
+          >
+            All
+          </button>
+          <button
+            className="btn btn-outline-dark me-2"
+            onClick={() => setData(data)}
+          >
+            Men`s Clothing
+          </button>
           <button className="btn btn-outline-dark me-2">
             Women`s Clothing
           </button>
           <button className="btn btn-outline-dark me-2">Jewelery</button>
           <button className="btn btn-outline-dark me-2">Electronic</button>
         </div>
-        {filter.map((product) => {
+        {data.map((product) => {
           return (
             <>
-              <div className="col-md-3">
-                <div className="card">
+              <div className="col-md-3 mb-4">
+                <div className="card h-100 text-center p-4 key={product.id}">
                   <img
                     src={product.image}
                     className="card-img-top"
                     alt={product.title}
+                    height="250px"
                   />
                   <div className="card-body">
-                    <h5 className="card-title">Card title</h5>
-                    <p className="card-text">
-                      Some quick example text to build on the card title and
-                      make up the bulk of the card`s content.
-                    </p>
-                    <a href="#" className="btn btn-primary">
-                      Go somewhere
+                    <h5 className="card-title mb-0">
+                      {product.title.substring(0, 12)}...
+                    </h5>
+                    <p className="card-text lead fw-bold">${product.price}</p>
+                    <a href="#" className="btn btn-outline-dark">
+                      Buy Now
                     </a>
                   </div>
                 </div>
